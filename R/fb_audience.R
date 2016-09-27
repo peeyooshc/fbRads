@@ -212,3 +212,34 @@ fbad_create_lookalike_audience <- function(fbacc, name, origin_audience_id, rati
     fromJSON(res)$id
 
 }
+
+#' Obtain list of all existing custom audience
+#' @references \url{https://developers.facebook.com/docs/marketing-api/lookalike-audience-targeting#create}
+#' @inheritParams fbad_request
+#' @param name string
+#' @param origin_audience_id numeric ID of origin custom audience
+#' @param ratio Between 0.01-0.20 and increments of 0.01. Indicates the top \code{ratio} percent of original audience in the selected country
+#' @param country Country name - the country to find the lookalike people.
+#' @return lookalike audience ID and name
+#' @export
+fbad_get_customaudiences <- function(fbacc, audience_id, fields = c('id', 'account_id', 'approximate_count','data_source', 'delivery_status', 'lookalike_audience_ids', 'lookalike_spec', 'name', 'permission_for_actions', 'operation_status', 'subtype', 'time_updated')) {
+    
+    ## get fields
+    fields <- match.arg(fields, several.ok = TRUE)
+    fields <- paste(fields, collapse = ',')
+    
+    if (missing(audience_id)) {
+      custom_audience_path = paste0('act_', fbacc$account_id, '/customaudiences?fields=name')
+    } else {
+      custom_audience_path = paste0(audience_id, '?fields=', fields)
+    }
+      
+    ## get results
+    res <- fbad_request(fbacc,
+                        path   = custom_audience_path,
+                        method = "GET")
+
+    ## return
+    fromJSON(res)
+
+  }
